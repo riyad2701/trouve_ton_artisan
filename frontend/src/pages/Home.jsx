@@ -46,8 +46,7 @@ export default function Home() {
         <p className="card-text text-muted mb-1">{artisan['Spécialité']}</p>
         <p className="card-text"><strong>Note :</strong> {artisan.Note} / 5</p>
         <p className="card-text"><small className="text-secondary">{artisan.Ville}</small></p>
-        <Link to={`/artisan/${index + 1}`} className="btn btn-primary w-100">
-          Voir la fiche
+        <Link to={`/artisan/${encodeURIComponent(artisan.Nom)}`} className="btn btn-primary w-100">          Voir la fiche
         </Link>
       </div>
       </div>

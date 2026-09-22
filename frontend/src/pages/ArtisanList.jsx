@@ -17,9 +17,12 @@ export default function ArtisansList() {
       const sheet = workbook.Sheets[sheetName];
       let data = XLSX.utils.sheet_to_json(sheet);
 
-      // Filtrer par catégorie (colonne "Spécialité")
+      // Filtrer par Catégorie OU par Spécialité
       if (categoryId) {
-      data = data.filter((item) => String(item['Spécialité']) === String(categoryId));
+      data = data.filter((item) =>
+      String(item['Catégorie']).trim().toLowerCase() === String(categoryId).trim().toLowerCase() ||
+      String(item['Spécialité']).trim().toLowerCase() === String(categoryId).trim().toLowerCase()
+      );
     }
 
       // Filtrer par recherche (colonne "Nom")
@@ -49,7 +52,7 @@ export default function ArtisansList() {
         <p className="card-text text-muted mb-1">{artisan['Spécialité']}</p>
         <p className="card-text"><strong>Note :</strong> {artisan.Note} / 5</p>
         <p className="card-text"><small className="text-secondary">{artisan.Ville}</small></p>
-        <Link to={`/artisan/${index + 1}`} className="btn btn-primary w-100">
+        <Link to={`/artisan/${encodeURIComponent(artisan.Nom)}`} className="btn btn-primary w-100">
           Voir la fiche
         </Link>
       </div>

@@ -33,7 +33,7 @@ export default function Header() {
     <header className="bg-white shadow-sm mb-4">
       <div className="container d-flex align-items-center justify-content-between py-3">
         <Link to="/" className="navbar-brand fw-bold text-primary fs-3">
-        <img src={logo} alt="Trouve ton artisan" style={{ height: '40px' }} />
+        <img src={logo} alt="Trouve ton artisan" style={{ height: '100px' }} />
         </Link>
         <nav>
           <ul className="nav">

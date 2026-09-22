@@ -15,9 +15,17 @@ export default function ArtisanDetail() {
         const sheet = workbook.Sheets[sheetName];
         const data = XLSX.utils.sheet_to_json(sheet);
 
-        const artisanIndex = parseInt(id, 10) - 1;
-        if (data[artisanIndex]) {
-          setArtisan(data[artisanIndex]);
+        // Décodage de l'URL et recherche par nom
+        const searchName = decodeURIComponent(id || '').trim().toLowerCase();
+       
+        const artisanTrouve = data.find(
+          (item) => String(item.Nom || '').trim().toLowerCase() === searchName
+        );
+
+        if (artisanTrouve) {
+          setArtisan(artisanTrouve);
+        } else {
+          console.log('Artisan non trouvé pour :', searchName);
         }
       })
       .catch((err) => console.error('Erreur chargement artisan :', err));
