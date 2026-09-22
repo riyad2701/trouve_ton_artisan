@@ -1,58 +1,64 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 
 export default function ArtisanDetail() {
   const { id } = useParams();
   const [artisan, setArtisan] = useState(null);
-  const [sent, setSent] = useState(false);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/artisans/${id}`)
-      .then(res => res.json())
-      .then(data => setArtisan(data));
+    fetch('/data.xlsx')
+      .then((res) => res.arrayBuffer())
+      .then((buffer) => {
+        const workbook = XLSX.read(buffer, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(sheet);
+
+        const artisanIndex = parseInt(id, 10) - 1;
+        if (data[artisanIndex]) {
+          setArtisan(data[artisanIndex]);
+        }
+      })
+      .catch((err) => console.error('Erreur chargement artisan :', err));
   }, [id]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSent(true);
-  };
-
-  if (!artisan) return <p>Chargement...</p>;
+  if (!artisan) {
+    return (
+      <div className="container mt-4">
+        <p>Chargement des détails de l'artisan...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="row">
-      <div className="col-md-6 mb-4">
-        <h2>{artisan.nom}</h2>
-        <p className="badge bg-primary fs-6">{artisan.specialite}</p>
-        <p><strong>Note :</strong> {artisan.note} / 5</p>
-        <p><strong>Ville :</strong> {artisan.ville}</p>
-        <h3 className="h5 mt-4">À propos</h3>
-        <p>{artisan.a_propos}</p>
-      </div>
-
-      <div className="col-md-6">
-        <div className="card p-4 shadow-sm">
-          <h3 className="h5 mb-3">Contacter l'artisan</h3>
-          {sent ? (
-            <div className="alert alert-success">Message envoyé avec succès !</div>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label className="form-label">Nom / Prénom</label>
-                <input type="text" className="form-control" required />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Objet</label>
-                <input type="text" className="form-control" required />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Message</label>
-                <textarea className="form-control" rows="4" required></textarea>
-              </div>
-              <button type="submit" className="btn btn-primary w-100">Envoyer</button>
-            </form>
-          )}
-        </div>
+    <div className="container mt-4">
+      <div className="card shadow-sm p-4">
+        <h2>{artisan.Nom}</h2>
+        <p className="text-muted">
+          <strong>Spécialité :</strong> {artisan['Spécialité']}
+        </p>
+        <p>
+          <strong>Note :</strong> {artisan.Note} / 5
+        </p>
+        <p>
+          <strong>Ville :</strong> {artisan.Ville}
+        </p>
+        <hr />
+        <h5>À propos</h5>
+        <p>{artisan['A propos']}</p>
+        <hr />
+        <p>
+          <strong>Email :</strong> {artisan.Email}
+        </p>
+        {artisan['Site Web'] && (
+          <p>
+            <strong>Site Web :</strong>{' '}
+            <a href={artisan['Site Web']} target="_blank" rel="noreferrer">
+              {artisan['Site Web']}
+            </a>
+          </p>
+        )}
       </div>
     </div>
   );

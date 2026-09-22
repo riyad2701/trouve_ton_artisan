@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import logo from '../Logo.png';
 
 export default function Header() {
@@ -8,11 +9,20 @@ export default function Header() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/categories')
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error(err));
-  }, []);
+  fetch('/data.xlsx')
+    .then((res) => res.arrayBuffer())
+    .then((buffer) => {
+      const workbook = XLSX.read(buffer, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const data = XLSX.utils.sheet_to_json(sheet);
+     
+      // Extraction des catégories uniques depuis le fichier Excel
+      const uniqueCategories = [...new Set(data.map((item) =>  item['Spécialité']).filter(Boolean))];
+      setCategories(uniqueCategories);
+    })
+    .catch((err) => console.error('Erreur chargement catégories :', err));
+}, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -27,13 +37,13 @@ export default function Header() {
         </Link>
         <nav>
           <ul className="nav">
-            {categories.map(cat => (
-              <li key={cat.id} className="nav-item">
-                <Link to={`/categorie/${cat.id}`} className="nav-link text-dark fw-bold">
-                  {cat.nom}
-                </Link>
-              </li>
-            ))}
+            {categories.map((cat, index) => (
+            <li key={index} className="nav-item">
+            <Link to={`/categorie/${cat}`} className="nav-link text-dark fw-bold">
+            {cat}
+            </Link>
+            </li>
+          ))}
           </ul>
         </nav>
         <form onSubmit={handleSearch} className="d-flex">

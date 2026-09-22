@@ -17,20 +17,22 @@ export default function ArtisansList() {
       const sheet = workbook.Sheets[sheetName];
       let data = XLSX.utils.sheet_to_json(sheet);
 
+      // Filtrer par catégorie (colonne "Spécialité")
       if (categoryId) {
-        data = data.filter((item) => String(item.category_id) === String(categoryId));
-      }
+      data = data.filter((item) => String(item['Spécialité']) === String(categoryId));
+    }
 
+      // Filtrer par recherche (colonne "Nom")
       if (search) {
-        data = data.filter((item) =>
-          item.name?.toLowerCase().includes(search.toLowerCase())
-        );
-      }
-
+      data = data.filter((item) =>
+      item.Nom?.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    
       setArtisans(data);
     })
     .catch((err) => console.error('Erreur Excel :', err));
-}, [categoryId, search]);
+    }, [categoryId, search]);
 
 
   return (
@@ -38,27 +40,21 @@ export default function ArtisansList() {
       <h2 className="h4 mb-4">
         {search ? `Résultats pour "${search}"` : 'Liste des artisans'}
       </h2>
-      {artisans.length === 0 ? (
-        <p>Aucun artisan trouvé.</p>
-      ) : (
-        <div className="row">
-          {artisans.map(artisan => (
-            <div key={artisan.id} className="col-md-4 mb-3">
-              <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                  <h3 className="h5 card-title">{artisan.nom}</h3>
-                  <p className="card-text text-muted mb-1">{artisan.specialite}</p>
-                  <p className="card-text"><strong>Note :</strong> {artisan.note} / 5</p>
-                  <p className="card-text"><small className="text-secondary">{artisan.ville}</small></p>
-                  <Link to={`/artisan/${artisan.id}`} className="btn btn-primary w-100">
-                    Voir la fiche
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+
+       {artisans.map((artisan, index) => (
+  <div key={index} className="col-md-4 mb-3">
+    <div className="card h-100 shadow-sm">
+      <div className="card-body">
+        <h3 className="h5 card-title">{artisan.Nom}</h3>
+        <p className="card-text text-muted mb-1">{artisan['Spécialité']}</p>
+        <p className="card-text"><strong>Note :</strong> {artisan.Note} / 5</p>
+        <p className="card-text"><small className="text-secondary">{artisan.Ville}</small></p>
+        <Link to={`/artisan/${index + 1}`} className="btn btn-primary w-100">
+          Voir la fiche
+        </Link>
+      </div>
     </div>
-  );
-}
+    </div>
+    ))}
+  </div>
+    )}
