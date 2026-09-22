@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import logo from '../Logo.png';
 
 export default function Header() {
   const [categories, setCategories] = useState([]);
@@ -22,7 +23,7 @@ export default function Header() {
     <header className="bg-white shadow-sm mb-4">
       <div className="container d-flex align-items-center justify-content-between py-3">
         <Link to="/" className="navbar-brand fw-bold text-primary fs-3">
-          Trouve ton artisan !
+        <img src={logo} alt="Trouve ton artisan" style={{ height: '40px' }} />
         </Link>
         <nav>
           <ul className="nav">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 
 export default function ArtisansList() {
   const { categoryId } = useParams();
@@ -8,14 +9,29 @@ export default function ArtisansList() {
   const [artisans, setArtisans] = useState([]);
 
   useEffect(() => {
-    let url = 'http://localhost:5000/api/artisans?';
-    if (categoryId) url += `categorie=${categoryId}&`;
-    if (search) url += `search=${encodeURIComponent(search)}`;
+  fetch('/data.xlsx')
+    .then((res) => res.arrayBuffer())
+    .then((buffer) => {
+      const workbook = XLSX.read(buffer, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      let data = XLSX.utils.sheet_to_json(sheet);
 
-    fetch(url)
-      .then(res => res.json())
-      .then(data => setArtisans(data));
-  }, [categoryId, search]);
+      if (categoryId) {
+        data = data.filter((item) => String(item.category_id) === String(categoryId));
+      }
+
+      if (search) {
+        data = data.filter((item) =>
+          item.name?.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      setArtisans(data);
+    })
+    .catch((err) => console.error('Erreur Excel :', err));
+}, [categoryId, search]);
+
 
   return (
     <div>
